@@ -1,4 +1,7 @@
-from django.core.urlresolvers import reverse_lazy
+from django.core.paginator import (
+    EmptyPage, PageNotAnInteger, Paginator)
+from django.core.urlresolvers import (
+    reverse, reverse_lazy)
 from django.shortcuts import (
     get_object_or_404, redirect, render)
 from django.views.generic import View
@@ -92,12 +95,61 @@ def startup_detail(request, slug):
         {'startup': startup})
 
 
-def startup_list(request):
-    return render(
-        request,
-        'organizer/startup_list.html',
-        {'startup_list': Startup.objects.all()})
+class StartupList(View):
+    page_kwarg = 'page'
+    paginate_by = 5  # 5 items per page
+    template_name = 'organizer/startup_list.html'
 
+    def get(self, request):
+        startups = Startup.objects.all()
+        paginator = Paginator(
+            startups, self.paginate_by)
+        page_number = request.GET.get(
+            self.page_kwarg)
+        try:
+            page = paginator.page(page_number)
+        except PageNotAnInteger:
+            page = paginator.page(1)
+        except EmptyPage:
+            page = paginator.page(
+                paginator.num_pages)
+        if page.has_previous():
+            prev_url = "?{pkw}={n}".format(
+                pkw=self.page_kwarg,
+                n=page.previous_page_number())
+        else:
+            prev_url = None
+        if page.has_next():
+            next_url = "?{pkw}={n}".format(
+                pkw=self.page_kwarg,
+                n=page.next_page_number())
+        else:
+            next_url = None
+        context = {
+            'is_paginated':page.has_other_pages(),
+            'next_page_url': next_url,
+            'paginator': paginator,
+            'previous_page_url': prev_url,
+            'startup_list': page,
+        }
+        return render(
+            request, self.template_name, context)
+
+#function based view
+# def startup_list(request):
+#     return render(
+#         request,
+#         'organizer/startup_list.html',
+#         {'startup_list': Startup.objects.all()})
+
+# class StartupList(View):
+#     template_name = 'organizer/startup_list.html'
+#
+#     def get(self, request):
+#         startups = Startup.objects.all()
+#         context = {'startup_list': startups}
+#         return render(
+#             request, self.template_name, context)
 
 class StartupUpdate(ObjectUpdateMixin, View):
     form_class = StartupForm
@@ -127,13 +179,66 @@ def tag_detail(request, slug):
         'organizer/tag_detail.html',
         {'tag': tag})
 
+# function based view
+# def tag_list(request):
+#     return render(
+#         request,
+#         'organizer/tag_list.html',
+#         {'tag_list': Tag.objects.all()})
 
-def tag_list(request):
-    return render(
-        request,
-        'organizer/tag_list.html',
-        {'tag_list': Tag.objects.all()})
+# class based view
+class TagList(View):
+    template_name = 'organizer/tag_list.html'
 
+    def get(self, request):
+        tags = Tag.objects.all()
+        context = {
+            'tag_list': tags,
+        }
+        return render(
+            request, self.template_name, context)
+
+class TagPageList(View):
+    paginate_by = 5
+    template_name = 'organizer/tag_list.html'
+
+    def get(self, request, page_number):
+        tags = Tag.objects.all()
+        paginator = Paginator(
+            tags, self.paginate_by)
+        try:
+            page = paginator.page(page_number)
+        except PageNotAnInteger:
+            page = paginator.page(1)
+        except EmptyPage:
+            page = paginator.page(
+                paginator.num_pages)
+        if page.has_previous():
+            prev_url = reverse(
+                'organizer_tag_page',
+                args=(
+                    page.previous_page_number(),
+                ))
+        else:
+            prev_url = None
+        if page.has_next():
+            next_url = reverse(
+                'organizer_tag_page',
+                args=(
+                    page.next_page_number(),
+                ))
+        else:
+            next_url = None
+        context = {
+            'is_paginated':
+                page.has_other_pages(),
+            'next_page_url': next_url,
+            'paginator': paginator,
+            'previous_page_url': prev_url,
+            'tag_list': page,
+        }
+        return render(
+            request, self.template_name, context)
 
 class TagUpdate(ObjectUpdateMixin, View):
     form_class = TagForm
