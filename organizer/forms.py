@@ -1,13 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
-
+from django.forms.widgets import HiddenInput
 from .models import NewsLink, Startup, Tag
-
-
-class NewsLinkForm(forms.ModelForm):
-    class Meta:
-        model = NewsLink
-        fields = '__all__'
 
 
 class SlugCleanMixin:
@@ -20,6 +14,14 @@ class SlugCleanMixin:
             raise ValidationError(
                 'Slug may not be "create".')
         return new_slug
+
+
+class NewsLinkForm(
+        SlugCleanMixin, forms.ModelForm):
+    class Meta:
+        model = NewsLink
+        fields = '__all__'
+        widgets = {'startup': HiddenInput()}
 
 
 class StartupForm(
