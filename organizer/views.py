@@ -20,7 +20,6 @@ class NewsLinkCreate(
     form_class = NewsLinkForm
     model = NewsLink
 
-
     def get_initial(self):
         startup_slug = self.kwargs.get(
             self.startup_slug_url_kwarg)
@@ -32,6 +31,7 @@ class NewsLinkCreate(
         }
         initial.update(self.initial)
         return initial
+
 
 class NewsLinkDelete(
         NewsLinkGetObjectMixin,

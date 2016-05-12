@@ -2,7 +2,7 @@ from django.conf.urls import url
 
 from ..views import (
     TagCreate, TagDelete, TagDetail, TagList,
-     TagUpdate,)
+    TagUpdate)
 
 urlpatterns = [
     url(r'^$',

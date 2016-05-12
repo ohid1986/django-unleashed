@@ -49,18 +49,18 @@
     {% endfor %}
   </div>
   <div class="desktop four columns">
-     <a
+      <a
         href="{% url 'blog_post_create' %}"
         class="button button-primary">
       Write New Blog Post</a>
     <h3>Archives by Month</h3>
-     <ul>
+    <ul>
       {% for m in date_list %}
       <li><a href="{% url 'blog_post_archive_month' m|date:"Y" m|date:"n" %}">
           {{ m|date:"F Y" }}</a></li>
       {% endfor %}
     </ul>
-    </div>
+  </div>
 </div>
 <div class="row">
   <div class="twelve columns">

@@ -95,11 +95,13 @@ class NewsLink(models.Model):
     def get_delete_url(self):
         return reverse(
             'organizer_newslink_delete',
-            kwargs={'startup_slug': self.startup.slug,
-                    'newslink_slug': self.slug})
+            kwargs={
+                'startup_slug': self.startup.slug,
+                'newslink_slug': self.slug})
 
     def get_update_url(self):
         return reverse(
             'organizer_newslink_update',
-            kwargs={'startup_slug': self.startup.slug,
-                    'newslink_slug': self.slug})
+            kwargs={
+                'startup_slug': self.startup.slug,
+                'newslink_slug': self.slug})

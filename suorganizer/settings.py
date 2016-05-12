@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django_extensions',
     'core',
+    'user',
     'organizer',
     'blog',
     'contact',
@@ -89,6 +90,46 @@ DATABASES = {
     }
 }
 
+
+# Logging
+# https://docs.djangoproject.com/en/1.8/topics/logging/
+
+from .log_filters import ManagementFilter
+
+verbose = (
+    "[%(asctime)s] %(levelname)s "
+    "[%(name)s:%(lineno)s] %(message)s")
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'remove_migration_sql': {
+            '()': ManagementFilter,
+        },
+    },
+    'handlers': {
+        'console': {
+            'filters': ['remove_migration_sql'],
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': verbose,
+            'datefmt': "%Y-%b-%d %H:%M:%S"
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'formatter': 'verbose'
+        },
+    },
+}
+
+
 # Email
 # https://docs.djangoproject.com/en/1.8/topics/email/
 
@@ -119,3 +160,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
+
+# Login Settings
+# https://docs.djangoproject.com/en/1.8/topics/auth/
+from django.core.urlresolvers import reverse_lazy
+
+LOGIN_REDIRECT_URL = reverse_lazy('blog_post_list')
+LOGIN_URL = reverse_lazy('dj-auth:login')
+LOGOUT_URL = reverse_lazy('dj-auth:logout')
